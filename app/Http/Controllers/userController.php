@@ -138,6 +138,7 @@ class userController extends Controller {
         $validate = Validator::make($request->all(), [
                     'file0' => 'required|image|mimes:jpg,jpeg,png',
         ]);
+        var_dump($image);
         if (!$image || $validate->fails()) {
             $data = array(
                 'code' => 400,
@@ -145,7 +146,7 @@ class userController extends Controller {
                 'message' => 'error al subir la imagen'
             );
         } else {
-            $image_name = time() . $image->getClientOriginalName();
+            $image_name = time().$image->getClientOriginalName();
             \Storage::disk('users')->put($image_name, \File::get($image));
             $data = array(
                 'code' => 200,
@@ -162,13 +163,13 @@ class userController extends Controller {
             return new Response($file,200);
         }else{
             $data = array(
-                'code' => 400,
+                'code' => 404,
                 'status' => 'error',
                 'message' => 'la imagen no existe'
             );
             return  response()->json($data, $data['code']);
         }
-        
+
     }
     public function details($id){
         $user = User::find($id);
@@ -180,7 +181,7 @@ class userController extends Controller {
             );
         }else{
             $data = array(
-                'code' => 400,
+                'code' => 404,
                 'status' => 'error',
                 'message' => 'el usuario no existe'
             );

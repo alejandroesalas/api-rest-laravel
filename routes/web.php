@@ -24,3 +24,5 @@ Route::get('/api/users/details/{id}','UserController@details');
 Route::resource('/api/category','CategoryController');
 //ruta del controlador de posts
 Route::resource('/api/post','PostController');
+Route::post('/api/users/upload','PostController@upload');
+Route::get('/api/post/avatar/{filename}','PostController@getImage');

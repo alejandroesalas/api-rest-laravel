@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Post;
 use App\Helpers\JwtAuth;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
+
 class PostController extends Controller
 {
     public function __construct() {
-        $this->middleware('api.auth', ['except' => ['index', 'show']]);
+        $this->middleware('api.auth', ['except' => ['index', 'show','getImage']]);
     }
      public function index() {
         $posts = Post::all()->load('category');
@@ -149,5 +152,41 @@ class PostController extends Controller
         //$token = $request->header('Authorization',null);
         $user = $jwtAuth->checkToken($token, true);
         return $user;
+    }
+    public function upload(Request $request){
+        $image = $request->file('file0');
+        $validate = Validator::make($request->all(), [
+            'file0' => 'required|image|mimes:jpg,jpeg,png',
+        ]);
+        if (!$image || $validate->fails()) {
+            $data = array(
+                'code' => 400,
+                'status' => 'error',
+                'message' => 'Error al subir la imagen'
+            );
+        } else {
+            $image_name = time().$image->getClientOriginalName();
+            \Storage::disk('image')->put($image_name, \File::get($image));
+            $data = array(
+                'code' => 200,
+                'status' => 'succes',
+                'image' => $image_name
+            );
+        }
+        return response()->json($data, $data['code']);
+    }
+    public function getImage($fileName) {
+        if((\Storage::disk('images')->exists($fileName))){
+            $file = \Storage::disk('images')->get($fileName);
+            return new Response($file,200);
+        }else{
+            $data = array(
+                'code' => 404,
+                'status' => 'error',
+                'message' => 'la imagen no existe'
+            );
+            return  response()->json($data, $data['code']);
+        }
+
     }
 }
