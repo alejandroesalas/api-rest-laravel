@@ -103,7 +103,7 @@ class PostController extends Controller
                     'errors' => $validate->errors()
                 );
             } else {
-                $post = Post::where('id',$id).update($params_array)->get();
+                $post = Post::where('id',$id).updateOrCreate($params_array)();
                 $data = array(
                     'status' => 'success',
                     'code' => 200,
@@ -119,5 +119,22 @@ class PostController extends Controller
         }
         return response()->json($data, $data['code']);
     }
-
+    public function destroy(Request $request,$id){
+        $post = Post::find($id);
+        if (is_object($post) &&!isEmpty($post)) {
+                $post->delete();
+            $data = array([
+                'code' => 200,
+                'status' => 'success',
+                'post'=>$post
+            ]);
+        }else {
+            $data = array([
+                'code' => 404,
+                'status' => 'error',
+                'message' => 'La entrada no existe'
+            ]);
+        }
+        return response()->json($data,$data['code']);
+    }
 }
