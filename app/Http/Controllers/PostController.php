@@ -11,7 +11,11 @@ use Illuminate\Support\Facades\Validator;
 class PostController extends Controller
 {
     public function __construct() {
-        $this->middleware('api.auth', ['except' => ['index', 'show','getImage']]);
+        $this->middleware('api.auth', ['except' => ['index'
+            ,'show',
+            'getImage',
+            'getPostsByUser',
+            'getPostByCategory']]);
     }
      public function index() {
         $posts = Post::all()->load('category');
@@ -189,4 +193,19 @@ class PostController extends Controller
         }
 
     }
+    public function getPostsByCategory($id){
+        $posts = Post::where('category_id',$id)->get();
+        return \response()->json([
+            'status'=>'success',
+            'posts'=>$posts
+        ],200);
+    }
+    public function getPostsByUser($id){
+        $posts = Post::where('user_id',$id)->get();
+        return \response()->json([
+            'status'=>'success',
+            'posts'=>$posts
+        ],200);
+    }
 }
+

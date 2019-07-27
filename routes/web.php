@@ -26,3 +26,5 @@ Route::resource('/api/category','CategoryController');
 Route::resource('/api/post','PostController');
 Route::post('/api/users/upload','PostController@upload');
 Route::get('/api/post/avatar/{filename}','PostController@getImage');
+Route::get('/api/post/category/{id}','PostController@getPostsByCategory');
+Route::get('/api/post/user/{id}','PostController@getPostsByUser');
