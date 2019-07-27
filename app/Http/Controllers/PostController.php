@@ -103,12 +103,13 @@ class PostController extends Controller
                     'errors' => $validate->errors()
                 );
             } else {
-                $post = Post::where('id',$id).update($params_array);
+                $post = Post::where('id',$id).update($params_array)->get();
                 $data = array(
                     'status' => 'success',
                     'code' => 200,
                     'message' => 'Se Actualizo con exito el objeto',
-                    'post' => $post);
+                    'post' => $post,
+                    'changes'=>$params_array);
             }
         }else{
             $data = array(
