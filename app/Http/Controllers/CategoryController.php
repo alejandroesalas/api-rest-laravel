@@ -43,7 +43,7 @@ class CategoryController extends Controller {
     public function store(Request $request) {
         $json = $request->input('json', null);
         $params_array = array_map('trim', json_decode($json, true));
-        if (!isEmpty($params_array)) {
+        if (!Empty($params_array)) {
             $validate = Validator::make($params_array, [
                         'name' => 'required',
             ]);
@@ -71,7 +71,7 @@ class CategoryController extends Controller {
     public function update(Request $request, $id) {
          $json = $request->input('json', null);
         $params_array = array_map('trim', json_decode($json, true));
-        if (!isEmpty($params_array)) {
+        if (!Empty($params_array)) {
             $validate = Validator::make($params_array, [
                         'name' => 'required',
             ]);

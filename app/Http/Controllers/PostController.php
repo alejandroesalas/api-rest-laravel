@@ -48,7 +48,7 @@ class PostController extends Controller
     public function store(Request $request) {
        $json = $request->input('json', null);
        $params_array = array_map('trim', json_decode($json, true));
-        if (!isEmpty($params_array)) {
+        if (!Empty($params_array)) {
             $user = $this->getidentity( $request->header('Authorization',null));
 
             $validate = Validator::make($params_array, [
@@ -90,7 +90,7 @@ class PostController extends Controller
     public function update(Request $request, $id) {
          $json = $request->input('json', null);
         $params_array = array_map('trim', json_decode($json, true));
-        if (!isEmpty($params_array)) {
+        if (!Empty($params_array)) {
             $validate = Validator::make($params_array, [
                 'title' => 'required',
                 'content'=>'required',

@@ -10,17 +10,17 @@ use App\User;
 class userController extends Controller {
 
     public function register(Request $request) {
-
         $json = $request->input('json', null);
+        //var_dump($json);
         //limpiar datos
         $params_array = array_map('trim', json_decode($json, true));
         //validamos los datos
-        if (!isEmpty($params_array)) {
+        if (!Empty($params_array)) {
             $validate = Validator::make($params_array, [
                         'name' => 'required|alpha',
                         'surname' => 'required|alpha',
                         'email' => 'required|email|unique:users',
-                        'password' => 'required|confirmed|min:6'
+                        'password' => 'required|confirmed|min:4'
             ]);
             if ($validate->fails()) {
                 $data = array(
@@ -44,7 +44,7 @@ class userController extends Controller {
         } else {
             $data = array(
                 'status' => 'error',
-                'code' => 200,
+                'code' => 404,
                 'message' => 'Los datos enviados no son correctos'
             );
         }
@@ -55,7 +55,7 @@ class userController extends Controller {
         $jwtAuth = new \App\helpers\JwtAuth();
         $json = $request->input('json', null);
         $params_array = array_map('trim', json_decode($json, true));
-        if (!isEmpty($params_array)) {
+        if (!Empty($params_array)) {
             $validate = Validator::make($params_array, [
                         'email' => 'required|email',
                         'password' => 'required|min:6'
@@ -94,7 +94,7 @@ class userController extends Controller {
         $params_array = array_map('trim', json_decode($json, true));
         $user = $jwtAuth->checkToken($token, true);
         //validamos los datos
-        if (!isEmpty($params_array)) {
+        if (!Empty($params_array)) {
             $validate = Validator::make($params_array, [
                         'name' => 'required|alpha',
                         'surname' => 'required|alpha',
