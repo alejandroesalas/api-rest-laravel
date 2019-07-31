@@ -38,7 +38,7 @@ class JwtAuth {
             if (is_null($getToken)) {
                 $data = $jwt;
             } else {
-                $decode = JWT::decode($jwt, $this->key);
+                $decode = JWT::decode($jwt, $this->key,array("HS256"));
                 $data = $decode;
             }
         } else {
