@@ -11,7 +11,6 @@ class userController extends Controller {
 
     public function register(Request $request) {
         $json = $request->input('json', null);
-        //var_dump($json);
         //limpiar datos
         $params_array = array_map('trim', json_decode($json, true));
         //validamos los datos
@@ -25,14 +24,15 @@ class userController extends Controller {
             if ($validate->fails()) {
                 $data = array(
                     'status' => 'error',
-                    'code' => 404,
+                    'code' => 400,
                     'message' => 'No se ha podido crear el objeto',
                     'errors' => $validate->errors()
                 );
             } else {
                 //encriptar la contraseña
-                $params_array['password'] = bcrypt($params_array['password']);
-                $params_array['role'] = 'ROLE_USER';
+                //$params_array['password'] = bcrypt($params_array['password']);
+                $params_array['password']=hash('sha256',$params_array['password']);
+                $params_array['role'] ='ROLE_USER';
                 $nuevoUsuario = \App\User::create($params_array);
                 $data = array(
                     'status' => 'success',
@@ -44,7 +44,7 @@ class userController extends Controller {
         } else {
             $data = array(
                 'status' => 'error',
-                'code' => 404,
+                'code' => 400,
                 'message' => 'Los datos enviados no son correctos'
             );
         }
@@ -54,35 +54,36 @@ class userController extends Controller {
     public function login(Request $request) {
         $jwtAuth = new \App\helpers\JwtAuth();
         $json = $request->input('json', null);
-        $params_array = array_map('trim', json_decode($json, true));
+        $params_array = array_map('trim', json_decode($json,true));
         if (!Empty($params_array)) {
             $validate = Validator::make($params_array, [
                         'email' => 'required|email',
-                        'password' => 'required|min:6'
+                        'password' => 'required|min:4'
             ]);
             if ($validate->fails()) {
                 $data = array(
                     'status' => 'error',
-                    'code' => 404,
+                    'code' => 400,
                     'message' => 'No se ha podido Identificar',
                     'errors' => $validate->errors()
                 );
             } else {
                 //encriptar la contraseña
-                $params_array['password'] = bcrypt($params_array['password']);
+                //$params_array['password'] = bcrypt($params_array['password']);
+                $params_array['password']=hash('sha256',$params_array['password']);
                 $data = $jwtAuth->signup($params_array['email'], $params_array['password']);
-                if (!isEmpty($params_array['gettoken'])) {
-                    $singup = $jwtAuth->signup($params_array['email'], $params_array['password'], true);
+                if (!Empty($params_array['gettoken'])) {
+                    $data = $jwtAuth->signup($params_array['email'], $params_array['password'], true);
                 }
             }
         } else {
             $data = array(
                 'status' => 'error',
-                'code' => 200,
+                'code' => 400,
                 'message' => 'Los datos enviados no son correctos'
             );
         }
-        return response()->json($data, 200);
+        return response()->json($data);
     }
 
     public function update(Request $request) {
