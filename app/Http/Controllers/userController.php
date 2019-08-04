@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use App\User;
+use Illuminate\Validation\Rule;
 
 class userController extends Controller {
 
@@ -64,7 +65,7 @@ class userController extends Controller {
                 $data = array(
                     'status' => 'error',
                     'code' => 400,
-                    'message' => 'No se ha podido Identificar',
+                    'message' => 'Campos No cumplen con los requisitos',
                     'errors' => $validate->errors()
                 );
             } else {
@@ -83,55 +84,70 @@ class userController extends Controller {
                 'message' => 'Los datos enviados no son correctos'
             );
         }
-        return response()->json($data);
+        return response()->json($data,200);
     }
 
     public function update(Request $request) {
         $token = $request->header('Authorization');
         $jwtAuth = new \App\helpers\JwtAuth();
-        //actualizar usuario
-        $json = $request->input('json', null);
-        //limpiar datos
-        $params_array = array_map('trim', json_decode($json, true));
-        $user = $jwtAuth->checkToken($token, true);
-        //validamos los datos
-        if (!Empty($params_array)) {
-            $validate = Validator::make($params_array, [
-                        'name' => 'required|alpha',
-                        'surname' => 'required|alpha',
-                        'email' => 'required|email|unique:users,' . $user->sub
-            ]);
-            if ($validate->fails()) {
+        $istokenValid = $jwtAuth->checkToken($token);
+        if($istokenValid){
+            $json = $request->input('json', null);
+            //limpiar datos
+            $params_array = array_map('trim', json_decode($json, true));
+            $user = $jwtAuth->checkToken($token, true);
+            //validamos los datos
+            if (!Empty($params_array)) {
+                $validate = Validator::make($params_array,[
+                    'name' => 'required|alpha',
+                    'surname' => 'required|alpha',
+                    'email' => [
+                        'required',
+                        'email',
+                        Rule::unique('users')->ignore($user->sub)
+                    ]
+                ]);
+                if ($validate->fails()) {
+                    $data = array(
+                        'status' => 'error',
+                        'code' => 400,
+                        'message' => 'Datos Invalidos',
+                        'errors' => $validate->errors()
+                    );
+                } else {
+                    //qitar campos que no quiero actualizar
+                    unset($params_array['id']);
+                    unset($params_array['role']);
+                    unset($params_array['password']);
+                    unset($params_array['created_at']);
+                    unset($params_array['remember_token']);
+                    unset($params_array['password_confirmation']);
+                    //Actualizar el usuario en la base de datos
+                    $userTarget = User::find($user->sub);
+                    User::where('id',$user->sub)->update($params_array);
+                    $data = array(
+                        'status' => 'success',
+                        'code' => 200,
+                        'message' => 'El usuario  ha sido actualizado con exito',
+                        'data' => $userTarget,
+                        'changes' => $params_array
+                    );
+                }
+            } else {
                 $data = array(
                     'status' => 'error',
-                    'code' => 404,
-                    'message' => 'No se ha podido crear el objeto',
-                    'errors' => $validate->errors()
-                );
-            } else {
-                //qitar campos que no quiero actualizar
-                unset($params_array['id']);
-                unset($params_array['role']);
-                unset($params_array['password']);
-                unset($params_array['created_at']);
-                unset($params_array['rembember_token']);
-                //Actualizar el usuario en la base de datos
-                $userTarget = User::where('id', $user->id)->update($params_array);
-                $data = array(
-                    'status' => 'success',
-                    'code' => 200,
-                    'message' => 'El usuario  ha sido actualizado con exito',
-                    'data' => $userTarget
+                    'code' => 400,
+                    'message' => 'Los datos enviados no son correctos'
                 );
             }
-        } else {
+        }else{
             $data = array(
                 'status' => 'error',
-                'code' => 200,
-                'message' => 'Los datos enviados no son correctos'
+                'code' => 400,
+                'message' => 'Token Invalido'
             );
         }
-        return response()->json($data);
+        return response()->json($data,$data['code']);
     }
 
     public function upload(Request $request) {

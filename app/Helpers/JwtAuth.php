@@ -44,8 +44,8 @@ class JwtAuth {
         } else {
             $data = array(
                 'status' => 'error',
-                'code' => 200,
-                'message' => 'Login incorrecto'
+                'code' => 400,
+                'message' => 'Correo y/o Contraseña son incorrectos'
             );
         }
         return $data;
@@ -54,8 +54,8 @@ class JwtAuth {
     function checkToken($token, $getIdentity = false) {
         $auth = false;
         try {
-            $decodeToken = JWT::decode($token, $this->key);
-            if (!isEmpty($decodeToken) && is_object($decodeToken) && isset($decodeToken->sub)) {
+            $decodeToken = JWT::decode($token, $this->key,array("HS256"));
+            if (!Empty($decodeToken) && is_object($decodeToken) && isset($decodeToken->sub)) {
                 $auth = true;
             }
         } catch (Exception $ex) {
