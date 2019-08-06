@@ -123,13 +123,13 @@ class userController extends Controller {
                     unset($params_array['remember_token']);
                     unset($params_array['password_confirmation']);
                     //Actualizar el usuario en la base de datos
-                    $userTarget = User::find($user->sub);
                     User::where('id',$user->sub)->update($params_array);
+                    $userTarget = User::find($user->sub);
                     $data = array(
                         'status' => 'success',
                         'code' => 200,
                         'message' => 'El usuario  ha sido actualizado con exito',
-                        'data' => $userTarget,
+                        'user' => $userTarget,
                         'changes' => $params_array
                     );
                 }
