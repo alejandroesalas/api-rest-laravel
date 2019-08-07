@@ -155,12 +155,12 @@ class userController extends Controller {
         $validate = Validator::make($request->all(), [
                     'file0' => 'required|image|mimes:jpg,jpeg,png',
         ]);
-        var_dump($image);
         if (!$image || $validate->fails()) {
             $data = array(
                 'code' => 400,
                 'status' => 'error',
-                'message' => 'error al subir la imagen'
+                'message' => 'error al subir la imagen',
+                'errors'=>$validate->errors()
             );
         } else {
             $image_name = time().$image->getClientOriginalName();

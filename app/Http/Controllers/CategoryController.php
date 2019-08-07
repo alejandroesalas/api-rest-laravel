@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Category;
+use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller {
 
@@ -16,7 +17,7 @@ class CategoryController extends Controller {
         $categories = Category::all();
         return response()->json([
                     'code' => 200,
-                    'status' => 'succes',
+                    'status' => 'success',
                     'categories' => $categories
                         ]
         );

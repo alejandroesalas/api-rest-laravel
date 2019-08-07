@@ -17,7 +17,7 @@ Route::get('/', function () {
 Route::post('/api/register','UserController@register');
 Route::post('/api/login','UserController@login');
 Route::put('/api/users/update','UserController@update')->middleware(\App\Http\Middleware\ApiAuthMiddleware::class);
-Route::post('/api/users/upload','UserController@upload')->middleware(\App\Http\Middleware\ApiAuthMiddleware::class);
+Route::post('/api/user/upload','UserController@upload')->middleware(\App\Http\Middleware\ApiAuthMiddleware::class);
 Route::get('/api/users/avatar/{filename}','UserController@getImage');
 Route::get('/api/users/details/{id}','UserController@details');
 

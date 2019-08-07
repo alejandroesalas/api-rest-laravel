@@ -31,6 +31,7 @@ class JwtAuth {
                 'email' => $user->email,
                 'name' => $user->name,
                 'surname' => $user->surname,
+                'image'=> $user->image,
                 'description'=>$user->description,
                 'iat' => time(),
                 'exp' => time() + (7 * 24 * 60 * 60)
@@ -55,7 +56,7 @@ class JwtAuth {
     function checkToken($token, $getIdentity = false) {
         $auth = false;
         try {
-            $decodeToken = JWT::decode($token, $this->key,array("HS256"));
+            $decodeToken = JWT::decode($token,$this->key,array('HS256'));
             if (!Empty($decodeToken) && is_object($decodeToken) && isset($decodeToken->sub)) {
                 $auth = true;
             }
